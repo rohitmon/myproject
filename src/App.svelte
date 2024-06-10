@@ -1,7 +1,10 @@
 <script>
+	import Modal from './Modal.svelte';
+	import Form from './AddPersonForm.svelte';
 	let firstName = 'Rohit';
 	let lastName = 'Mondal';
 	let beltcolour = 'yellow';
+	let showModal = false;
 
 	$: fullName = `${firstName} ${lastName}`
 
@@ -14,8 +17,12 @@
 	    beltcolour = e.target.value;
 	}
 
-	const handleClick = () => {
-        beltcolour = 'orange';
+	const handleClick = (id) => {
+        people = people.filter((person) => person.id != id)
+    }
+
+	const toggleModal = () => {
+        showModal =!showModal;
     }
 
 	let people = [
@@ -24,17 +31,27 @@
 		{name: 'Raju', beltcolour: 'red', age: 26, id : 3}
 	]
 
-</script>
+	
+	const addPerson = (e) => {
+		const person = e.detail;
+		people = [person, ...people];
+	}
 
+</script>
+<Modal  {showModal} on:click={toggleModal}>
+	<Form on:addPerson={addPerson}/>
+</Modal>
 <main>
+	<button on:click={toggleModal}>Show Modal</button>
 	{#each people as person (person.id)}
 		<div>
 			<p>{person.name} - {person.beltcolour} belt</p>
-            <button on:click={handleClick}>{person.beltcolour}</button>
+            <button on:click={() => handleClick(person.id)}>Delete</button>
             <input type="text" bind:value={person.beltcolour}>
             <input type="text" bind:value={person.name}>
             <input type="text" bind:value={person.age}>
             <input type="text" bind:value={person.id}>
+			<label name="skills"><input type="text" bind:value={person.skills}>
             <br>
 		</div>
 	{:else}
